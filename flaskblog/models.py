@@ -16,6 +16,7 @@ class User(db.Model,UserMixin):
     image_file = db.Column(db.String(20), nullable=False,
                            default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
+    date_of_join = db.Column(db.DateTime,default=datetime.utcnow())
     # here Post is referenced as class
     posts = db.relationship('Post', backref='author', lazy=True)
 
