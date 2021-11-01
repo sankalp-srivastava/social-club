@@ -1,13 +1,15 @@
 from datetime import timezone
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import render_template, url_for, flash, redirect, request, Blueprint,current_app
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog import db, bcrypt
 from flaskblog.models import User, Post
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
-from flaskblog.users.utils import save_picture, send_reset_email
+from flaskblog.users.utils import save_picture, send_reset_email,send_email_verification
 from os.path import join
 from os import remove
+from secrets import token_hex
 
 users = Blueprint('users',__name__)
 
@@ -17,14 +19,32 @@ def register():
         return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data,email=form.email.data,password = hashed_pw)
-        db.session.add(user)
-        db.session.commit()
-        flash("Your account has been created! You can now log in", 'success')
-        return redirect(url_for('users.login'))
+        register.verification_code = token_hex(16)
+        register.form = form
+        send_email_verification(form.email.data,register.verification_code)
+        flash("A verification link has been sent to your email. Verify to login", 'success')
+        return redirect(url_for('main.home'))
     return render_template('register.html', title='Register', form=form)
 
+@users.route('/emailverification/<token>',methods=['GET','POST'])
+def email_verification(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+    s = Serializer(current_app.config['SECRET_KEY'])
+    try:
+        user_code = s.loads(token)['user_code']
+    except:
+        user_code = ""
+    if user_code == register.verification_code:
+        hashed_pw = bcrypt.generate_password_hash(register.form.password.data).decode('utf-8')
+        user = User(username=register.form.username.data,email=register.form.email.data,password = hashed_pw)
+        db.session.add(user)
+        db.session.commit()
+        flash("You account has been verified. You may now login", 'success')
+        return redirect(url_for('users.login'))
+    else:
+        flash("Invalid/Expired token. Please try again", 'danger')
+        return redirect(url_for('users.register'))
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
@@ -55,7 +75,6 @@ def account():
             old_name = current_user.image_file 
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
-            print(old_name)
             if old_name != 'default.jpg':
                 remove(join(current_app.root_path,'static/profile_pics',old_name))
         current_user.username = form.username.data
