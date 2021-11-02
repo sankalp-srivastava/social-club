@@ -30,3 +30,18 @@
   {% endif %}
 {% endfor %}
 {% endblock content %}
+{% block sidebar %}
+<div class="col-md-4 ">
+  <div class="content-section">
+    <h3>Sidebar</h3>
+    <p class='text-muted'>This Section is Under Construction and will be updated soon.
+    <ul class="list-group">
+        <li class="list-group-item list-group-item-light"><a href="{{url_for('posts.new_post')}}">Create New Post</a></li>
+        <li class="list-group-item list-group-item-light"><a href="{{url_for('main.home')}}">Latest Posts</a></li>
+        <li class="list-group-item list-group-item-light">Calendars</li>
+        <li class="list-group-item list-group-item-light">etc</li>
+    </ul>
+    </p>
+</div>
+</div>
+{% endblock sidebar %}

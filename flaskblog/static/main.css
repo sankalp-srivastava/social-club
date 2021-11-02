@@ -92,3 +92,12 @@ body {
   background-color: #000000d5;
   border-color: #000000;
 }
+.delete{
+  color:rgba(247, 0, 0, 0.945);
+  font-weight: 400;
+  text-decoration: none;
+}
+.delete:hover{
+  color:rgb(201, 24, 24);
+  text-decoration: underline;
+}

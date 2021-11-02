@@ -7,7 +7,7 @@ from flaskblog.models import User
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
-                           validators=[DataRequired(), Length(min=5, max=20),Regexp('^\w+$', message="Username must contain only letters,numbers or underscore")])
+                           validators=[DataRequired(), Length(min=5, max=20),Regexp('^[a-zA-Z0-9]{4,20}$', message="Username must contain only letters and/or numbers")])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[
                              DataRequired(), Length(min=5, max=20)])
@@ -64,3 +64,8 @@ class ResetPasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[
         DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+class DeleteAccountForm(FlaskForm):
+    password = PasswordField('Password', validators=[
+        DataRequired(), Length(min=5, max=20)])
+    submit = SubmitField('Delete Account')

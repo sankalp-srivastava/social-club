@@ -5,7 +5,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog import db, bcrypt
 from flaskblog.models import User, Post
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                   RequestResetForm, ResetPasswordForm)
+                                   RequestResetForm, ResetPasswordForm,DeleteAccountForm)
 from flaskblog.users.utils import save_picture, send_reset_email,send_email_verification
 from os.path import join
 from os import remove
@@ -70,6 +70,7 @@ def logout():
 @login_required
 def account():
     form = UpdateAccountForm()
+    delform = DeleteAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
             old_name = current_user.image_file 
@@ -87,7 +88,7 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static',filename='profile_pics/'+current_user.image_file)
-    return render_template('account.html',title ='Account',image_file=image_file,form = form)
+    return render_template('account.html',title ='Account',image_file=image_file,form = form,delform = delform)
 
 @users.route("/user/<string:username>")
 def user_posts(username):
@@ -127,4 +128,7 @@ def reset_token(token):
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password',form = form)
 
-
+@users.route('/deleteaccount', methods=['GET', 'POST'])
+@login_required
+def delete_account(user_id):
+    pass

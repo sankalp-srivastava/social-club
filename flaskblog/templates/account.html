@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="content-section">
+<div class="content-section" style ="padding-bottom: 30px;">
     <div class="media">
       <img class="rounded-circle account-img" src={{image_file}}>
       <div class="media-body">
@@ -54,5 +54,43 @@
                 {{form.submit(class="btn btn-outline-info")}}
             </div>
         </form>
+        <div class="border-top pt-1 form-group">
+            <small class="text-muted form-group">
+                <button type="button" class ="btn delete float-right " data-toggle="modal" data-target="#deleteaccountModal">Delete Account ?</button>
+            </small>
+        </div>
   </div>
+<!-- Modal -->
+<div class="modal fade" id="deleteaccountModal" tabindex="-1" role="dialog" aria-labelledby="Delete Account" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container d-flex pl-0"><img src="https://imgur.com/Kh1gwTq.png">
+                    <h5 class="modal-title ml-2" id="deleteaccountModal">Delete your account?</h5>
+                </div> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">If you delete your account, all the posts will be lost and cannot be undone. Enter your password to proceed.</p>
+            </div>
+            <div class="modal-footer justify-content-between"> 
+                <form style ="margin: 0 auto"action="{{url_for('users.delete_account',user_id=current_user.id)}}" method="POST">
+                    <div class="form-group">
+                        {{delform.password.label(class="form-control-label")}}
+                        {%if delform.password.errors%}
+                        {{delform.password(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {%for error in delform.password.errors%}
+                            <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                        {%else%}
+                        {{delform.password(class="form-control")}}
+                        {%endif%}
+                    </div>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                    <input class= "btn btn-danger " type="submit" value="Delete Account">
+                </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}
