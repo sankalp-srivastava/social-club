@@ -2,3 +2,4 @@ __pycache__/
 users/__pycache__/
 posts/__pycache__/
 main/__pycache__/
+site.db
