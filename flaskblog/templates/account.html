@@ -73,7 +73,9 @@
                 <p class="text-muted">If you delete your account, all the posts will be lost and cannot be undone. Enter your password to proceed.</p>
             </div>
             <div class="modal-footer justify-content-between"> 
-                <form style ="margin: 0 auto"action="{{url_for('users.delete_account',user_id=current_user.id)}}" method="POST">
+                <form style ="margin: 0 auto"action="" method="POST" enctype = "multipart/form-data">
+                    <!-- csrf token -->
+                    {{delform.hidden_tag()}}
                     <div class="form-group">
                         {{delform.password.label(class="form-control-label")}}
                         {%if delform.password.errors%}
@@ -88,7 +90,8 @@
                         {%endif%}
                     </div>
                     <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
-                    <input class= "btn btn-danger " type="submit" value="Delete Account">
+                    {{delform.submit(class="btn btn-danger")}}
+                    <!-- <input class= "btn btn-danger " type="submit" value="Delete Account"> -->
                 </form>
         </div>
     </div>

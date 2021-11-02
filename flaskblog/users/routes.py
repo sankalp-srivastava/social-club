@@ -71,7 +71,20 @@ def logout():
 def account():
     form = UpdateAccountForm()
     delform = DeleteAccountForm()
-    if form.validate_on_submit():
+    print(form.validate_on_submit())
+    print(delform.validate_on_submit())
+    if delform.validate_on_submit():
+        print("del1")
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        if bcrypt.check_password_hash(current_user.password,delform.password.data):
+            delete_account(current_user.id)
+            flash("It is sad to see you go 🙁. You account is now deleted","info")
+            return redirect(url_for('main.home'))
+        else:
+            flash("Password entered was incorrect. Please Try again","danger")
+            return redirect(url_for('users.account'))
+    elif form.validate_on_submit():
         if form.picture.data:
             old_name = current_user.image_file 
             picture_file = save_picture(form.picture.data)
@@ -85,6 +98,7 @@ def account():
         return redirect(url_for('users.account')) # we add this here else browser will say confirm reload 
         # your data will be lost. so in this way first we get and then post
     elif request.method == 'GET':
+        print("from get")
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static',filename='profile_pics/'+current_user.image_file)
@@ -128,7 +142,12 @@ def reset_token(token):
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password',form = form)
 
-@users.route('/deleteaccount', methods=['GET', 'POST'])
 @login_required
 def delete_account(user_id):
-    pass
+    logout_user()
+    delete_post = Post.__table__.delete().where(Post.user_id == user_id)
+    db.session.execute(delete_post)
+    db.session.commit()
+    delete_user = User.__table__.delete().where(User.id == user_id)
+    db.session.execute(delete_user)
+    db.session.commit()
