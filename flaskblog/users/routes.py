@@ -71,10 +71,7 @@ def logout():
 def account():
     form = UpdateAccountForm()
     delform = DeleteAccountForm()
-    print(form.validate_on_submit())
-    print(delform.validate_on_submit())
     if delform.validate_on_submit():
-        print("del1")
         form.username.data = current_user.username
         form.email.data = current_user.email
         if bcrypt.check_password_hash(current_user.password,delform.password.data):
@@ -98,7 +95,6 @@ def account():
         return redirect(url_for('users.account')) # we add this here else browser will say confirm reload 
         # your data will be lost. so in this way first we get and then post
     elif request.method == 'GET':
-        print("from get")
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static',filename='profile_pics/'+current_user.image_file)
