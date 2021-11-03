@@ -17,6 +17,7 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
+    db.create_all()
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
