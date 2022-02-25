@@ -19,32 +19,14 @@ def register():
         return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        register.verification_code = bcrypt.generate_password_hash(register.form.email.data).decode('utf-8')
-        register.form = form
-        send_email_verification(form.email.data,register.verification_code)
-        flash("A verification link has been sent to your email. Verify to login", 'success')
-        return redirect(url_for('main.home'))
-    return render_template('register.html', title='Register', form=form)
-
-@users.route('/emailverification/<token>',methods=['GET','POST'])
-def email_verification(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    s = Serializer(current_app.config['SECRET_KEY'])
-    try:
-        user_code = s.loads(token)['user_code']
-    except:
-        user_code = ""
-    if bcrypt.check_password_hash(user_code,register.form.email.data):
-        hashed_pw = bcrypt.generate_password_hash(register.form.password.data).decode('utf-8')
-        user = User(username=register.form.username.data,email=register.form.email.data,password = hashed_pw)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash("You account has been verified. You may now login", 'success')
+        flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('users.login'))
-    else:
-        flash("Invalid/Expired token. Please try again", 'danger')
-        return redirect(url_for('users.register'))
+    return render_template('register.html', title='Register', form=form)
+
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
