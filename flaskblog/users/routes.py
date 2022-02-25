@@ -19,7 +19,7 @@ def register():
         return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        register.verification_code = token_hex(16)
+        register.verification_code = bcrypt.generate_password_hash(register.form.email.data).decode('utf-8')
         register.form = form
         send_email_verification(form.email.data,register.verification_code)
         flash("A verification link has been sent to your email. Verify to login", 'success')
@@ -35,7 +35,7 @@ def email_verification(token):
         user_code = s.loads(token)['user_code']
     except:
         user_code = ""
-    if user_code == register.verification_code:
+    if bcrypt.check_password_hash(user_code,register.form.email.data):
         hashed_pw = bcrypt.generate_password_hash(register.form.password.data).decode('utf-8')
         user = User(username=register.form.username.data,email=register.form.email.data,password = hashed_pw)
         db.session.add(user)
